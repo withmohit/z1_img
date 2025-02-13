@@ -11,6 +11,7 @@
 
 ## 🔹 API Endpoints
 ### **Auth APIs**
+https://z1-imgback.onrender.com/docs
 - `GET /auth/login` → Redirects user to X (Twitter) authentication
 - `GET /auth/callback` → Handles X (Twitter) OAuth callback and retrieves tokens
 
