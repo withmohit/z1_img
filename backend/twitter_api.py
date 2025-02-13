@@ -1,24 +1,29 @@
-import requests
+import tweepy
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BEARER_TOKEN = os.getenv("X_BEARER_TOKEN")
+# Load credentials from .env file
+API_KEY = os.getenv("X_API_KEY")
+API_SECRET = os.getenv("X_API_SECRET")
+ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET")
+
+# Authenticate with Twitter API
+auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+api = tweepy.API(auth)
 
 def post_images_to_twitter():
-    image_paths = [f"resized_images/image_{size[0]}x{size[1]}.png" for size in [(300, 250), (728, 90), (160, 600), (300, 600)]]
-    
-    headers = {"Authorization": f"Bearer {BEARER_TOKEN}"}
+    image_paths = ["resized_images/image_300x250.png", "resized_images/image_728x90.png", 
+                   "resized_images/image_160x600.png", "resized_images/image_300x600.png"]
+
     media_ids = []
-
     for path in image_paths:
-        with open(path, "rb") as file:
-            response = requests.post("https://upload.twitter.com/1.1/media/upload.json", headers=headers, files={"media": file})
-            media_ids.append(response.json()["media_id_string"])
+        upload = api.media_upload(path)
+        media_ids.append(upload.media_id_string)
 
-    post_url = "https://api.twitter.com/2/tweets"
-    tweet_data = {"text": "Resized images", "media": {"media_ids": media_ids}}
+    api.update_status(status="Here are the resized images! 📸", media_ids=media_ids)
 
-    response = requests.post(post_url, headers=headers, json=tweet_data)
-    return response.json()
+    return {"message": "Images posted successfully!", "media_ids": media_ids}
