@@ -15,9 +15,12 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from image_processing import process_images
 from twitter_api import post_images_to_twitter
+from auth import router as auth_router
 import os
 
 app = FastAPI()
+
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,

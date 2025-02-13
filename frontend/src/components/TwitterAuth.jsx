@@ -1,18 +1,18 @@
 import React from "react";
-import axios from "axios";
 
 const TwitterAuth = () => {
-  const handlePostImages = async () => {
-    try {
-      const response = await axios.post("https://z1-imgback.onrender.com/post");
-      alert("Images posted to X successfully!");
-    } catch (error) {
-      alert("Failed to post images");
-      console.error(error);
-    }
+  const handleLogin = async () => {
+    const response = await fetch("http://localhost:8000/auth/login");
+    const data = await response.json();
+    window.location.href = data.login_url; // Redirect to Twitter login
   };
 
-  return <button onClick={handlePostImages}>Post to X</button>;
+  return (
+    <div>
+      <h2>Login with Twitter</h2>
+      <button onClick={handleLogin}>Login</button>
+    </div>
+  );
 };
 
 export default TwitterAuth;

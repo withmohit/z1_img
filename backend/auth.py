@@ -1,27 +1,48 @@
-from fastapi import APIRouter, Request
-import tweepy
 import os
+from fastapi import APIRouter, HTTPException
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
 
-API_KEY = os.getenv("X_API_KEY")
-API_SECRET = os.getenv("X_API_SECRET")
-CALLBACK_URL = "http://localhost:8000/auth/callback"  # Change for production
+# Twitter API credentials
+CLIENT_ID = os.getenv("X_CLIENT_ID")
+CLIENT_SECRET = os.getenv("X_CLIENT_SECRET")
+REDIRECT_URI = "http://localhost:8000/auth/callback"
 
 @router.get("/auth/login")
 def login():
-    auth = tweepy.OAuthHandler(API_KEY, API_SECRET, CALLBACK_URL)
-    redirect_url = auth.get_authorization_url()
-    return {"redirect_url": redirect_url}
+    """Redirects user to Twitter login."""
+    auth_url = (
+        f"https://twitter.com/i/oauth2/authorize"
+        f"?response_type=code"
+        f"&client_id={CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&scope=tweet.read users.read offline.access"
+        f"&state=secure_random_string"
+        f"&code_challenge=challenge"
+        f"&code_challenge_method=plain"
+    )
+    return {"login_url": auth_url}
 
 @router.get("/auth/callback")
-def callback(request: Request):
-    oauth_token = request.query_params.get("oauth_token")
-    oauth_verifier = request.query_params.get("oauth_verifier")
+def callback(code: str):
+    """Handles Twitter OAuth callback."""
+    token_url = "https://api.twitter.com/2/oauth2/token"
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI,
+        "code_verifier": "challenge"
+    }
+    response = requests.post(token_url, data=data)
 
-    auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
-    auth.request_token = {"oauth_token": oauth_token, "oauth_token_secret": oauth_verifier}
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail="Failed to authenticate")
 
-    access_token, access_token_secret = auth.get_access_token(oauth_verifier)
-
-    return {"access_token": access_token, "access_token_secret": access_token_secret}
+    tokens = response.json()
+    return {"message": "Authenticated!", "tokens": tokens}
