@@ -2,8 +2,20 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from image_processing import process_images
 from twitter_api import post_images_to_twitter
 import os
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
