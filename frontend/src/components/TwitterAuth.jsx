@@ -67,7 +67,7 @@ import React from "react";
 
 const TwitterAuth = () => {
   const handleLogin = async () => {
-    const response = await fetch("http://localhost:8000/auth/login");
+    const response = await fetch("https://z1-imgback.onrender.com/auth/login");
     const data = await response.json();
     window.location.href = data.login_url; // Redirect to Twitter login
   };

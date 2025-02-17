@@ -10,7 +10,7 @@ router = APIRouter()
 # Twitter API credentials
 CLIENT_ID = os.getenv("X_CLIENT_ID")
 CLIENT_SECRET = os.getenv("X_CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:8000/auth/callback"
+REDIRECT_URI = "https://z1-imgback.onrender.com/auth/callback"
 
 @router.get("/auth/login")
 def login():

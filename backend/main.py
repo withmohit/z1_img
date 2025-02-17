@@ -41,11 +41,3 @@ async def upload_image(file: UploadFile = File(...)):
         return {"message": "Images resized", "files": list(resized_images.keys())}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# @app.post("/post/")
-# async def post_images():
-#     try:
-#         result = post_images_to_twitter()
-#         return {"message": "Images posted successfully", "details": result}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
